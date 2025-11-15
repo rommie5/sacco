@@ -1,0 +1,21 @@
+{% extends 'savings/base.html' %}
+{% block content %}
+<div class="container">
+  <h3>My Deposit Requests</h3>
+  <table class="table">
+    <thead><tr><th>Date</th><th>Amount</th><th>Status</th><th>Ref</th></tr></thead>
+    <tbody>
+      {% for dr in deposits %}
+        <tr>
+          <td>{{ dr.created_at }}</td>
+          <td>{{ dr.amount }}</td>
+          <td>{{ dr.get_status_display }}</td>
+          <td>{{ dr.payment_reference }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="4">No deposit requests</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

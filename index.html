@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Savings - Online Sacco</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+    --primary-color: #007bff; /* Sacco/Brand Blue */
+    --secondary-color: #6c757d; /* Grey for secondary actions */
+    --success-color: #28a745; /* Green for deposits/credit */
+    --danger-color: #dc3545; /* Red for withdrawals/debit (if shown) */
+    --background-light: #f4f7f6;
+    --card-background: #ffffff;
+    --text-dark: #333;
+    --text-light: #666;
+    --border-color: #eee;
+    --shadow-light: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-light);
+    color: var(--text-dark);
+}
+
+header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 20px 40px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Main Layout --- */
+.savings-container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+hr {
+    border: none;
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 40px 0;
+}
+
+h2 {
+    color: var(--primary-color);
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+/* --- Card Styles (Overview Section) --- */
+.savings-overview {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background-color: var(--card-background);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-light);
+    flex: 1;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.icon-large {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.amount {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1;
+    margin: 10px 0 20px 0;
+}
+
+.small-amount {
+    font-size: 2rem;
+}
+
+.cents {
+    font-size: 0.5em;
+    opacity: 0.7;
+}
+
+/* --- Button Styles --- */
+.cta-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s;
+    margin-top: 15px;
+}
+
+.primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.primary:hover {
+    background-color: #0056b3;
+}
+
+.secondary {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.secondary:hover {
+    background-color: #5a6268;
+}
+
+/* --- Goals Section --- */
+.goal-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+.goal-card {
+    background-color: var(--card-background);
+    padding: 20px;
+    border-radius: 10px;
+    border-left: 5px solid var(--success-color);
+    box-shadow: var(--shadow-light);
+}
+
+.goal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.goal-card i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-right: 10px;
+}
+
+.goal-card h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    flex-grow: 1;
+}
+
+.current-amount {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    margin: 15px 0 5px 0;
+}
+
+.status-tag {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-weight: 700;
+}
+
+.active {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--success-color);
+}
+
+.target {
+    background-color: rgba(0, 123, 255, 0.1);
+    color: var(--primary-color);
+}
+
+.progress-bar-container {
+    height: 10px;
+    background-color: var(--border-color);
+    border-radius: 5px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: var(--success-color); /* Default progress color */
+    border-radius: 5px;
+    transition: width 0.5s ease;
+}
+
+.contribution {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-top: 5px;
+}
+
+.add-goal-btn {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    padding: 15px;
+    font-size: 1.1rem;
+}
+
+/* --- Transactions Section (Table) --- */
+.recent-transactions {
+    margin-top: 40px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: var(--card-background);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow-light);
+}
+
+thead th {
+    background-color: var(--primary-color);
+    color: white;
+    text-align: left;
+    padding: 15px;
+    font-weight: 600;
+}
+
+tbody td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.credit {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+.debit {
+    color: var(--danger-color);
+    font-weight: 600;
+}
+
+.view-all-link {
+    display: block;
+    text-align: center;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    background-color: #e9ecef;
+    color: var(--text-light);
+}
+
+/* --- Responsive adjustments --- */
+@media (max-width: 900px) {
+    .savings-overview {
+        flex-direction: column;
+    }
+}
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>💰 My Sacco Savings</h1>
+        <p>Your journey to financial freedom starts here.</p>
+    </header>
+
+    <main class="savings-container">
+        <section class="savings-overview">
+            <h2>Current Savings Summary</h2>
+            <div class="card total-balance">
+                <i class="fas fa-wallet icon-large"></i>
+                <h3>Total Balance</h3>
+                <p class="amount">$5,450.<span class="cents">00</span></p>
+                <button class="cta-button primary">Deposit Funds</button>
+            </div>
+            <div class="card interest-earned">
+                <i class="fas fa-hand-holding-usd icon-large"></i>
+                <h3>Interest Earned YTD</h3>
+                <p class="amount small-amount">$125.<span class="cents">50</span></p>
+                <button class="cta-button secondary">View Interest Statement</button>
+            </div>
+        </section>
+
+        <hr>
+
+        <section class="accounts-goals">
+            <h2>My Savings Accounts & Goals</h2>
+            <div class="goal-list">
+                <div class="goal-card">
+                    <div class="goal-header">
+                        <i class="fas fa-heart-pulse"></i>
+                        <h3>Emergency Fund</h3>
+                        <span class="status-tag active">Active</span>
+                    </div>
+                    <p class="current-amount">$2,100 / $3,000</p>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 70%;"></div>
+                    </div>
+                    <p class="contribution">Last contribution: $200 on 01/10/2025</p>
+                </div>
+
+                <div class="goal-card">
+                    <div class="goal-header">
+                        <i class="fas fa-graduation-cap"></i>
+                        <h3>Kids' Education</h3>
+                        <span class="status-tag target">Target</span>
+                    </div>
+                    <p class="current-amount">$3,350 / $5,000</p>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 67%; background-color: #38c172;"></div>
+                    </div>
+                    <p class="contribution">Monthly Auto-Save: $150</p>
+                </div>
+
+            </div>
+            <button class="cta-button primary add-goal-btn"><i class="fas fa-plus"></i> Create New Savings Goal</button>
+        </section>
+
+        <hr>
+
+        <section class="recent-transactions">
+            <h2>Recent Savings Transactions</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>08/11/2025</td>
+                        <td>Monthly Auto-Save (Education)</td>
+                        <td class="credit">+$150.00</td>
+                        <td>Deposit</td>
+                    </tr>
+                    <tr>
+                        <td>01/11/2025</td>
+                        <td>Quarterly Interest Payout</td>
+                        <td class="credit">+$50.50</td>
+                        <td>Interest</td>
+                    </tr>
+                    <tr>
+                        <td>25/10/2025</td>
+                        <td>Ad-Hoc Deposit (Emergency)</td>
+                        <td class="credit">+$100.00</td>
+                        <td>Deposit</td>
+                    </tr>
+                </tbody>
+            </table>
+            <a href="#" class="view-all-link">View All Transactions</a>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Online Sacco. Secure and Transparent Savings.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

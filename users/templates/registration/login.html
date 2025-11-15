@@ -1,0 +1,49 @@
+
+
+{% extends 'users/base.html' %}
+{% load form_tags %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-lg p-4" style="width: 420px; border-radius: 12px;">
+
+        <div class="text-center mb-3">
+            <h3 class="fw-bold text-primary">Welcome Back</h3>
+            <p class="text-muted m-0">Login to access your account</p>
+        </div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} text-center py-1 my-2">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Username</label>
+                {{ form.username|add_class:"form-control form-control-lg" }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Password</label>
+                {{ form.password|add_class:"form-control form-control-lg" }}
+            </div>
+
+            <button class="btn btn-primary w-100 btn-lg mt-2" type="submit">
+                Login
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <span class="text-muted">Don’t have an account?
+                <a href="{% url 'register' %}" class="fw-bold text-primary">
+                    Register here
+                </a>
+            </span>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

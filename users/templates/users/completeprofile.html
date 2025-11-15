@@ -1,0 +1,50 @@
+{% extends 'users/base.html' %}
+{% load widget_tweaks %}
+{% block title %}Membership KYC{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm p-4">
+        <h4 class="text-center text-primary mb-4">Membership Details</h4>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <h6 class="fw-bold mt-3 text-secondary">Personal Details</h6><hr>
+            {% for field in form.visible_fields %}
+                {% if field.name in "surname other_name given_name area_of_residence date_of_birth marital_status phone_number passport_photo"%}
+                    <div class="mb-3">
+                        {{ field.label_tag }}
+                        {{ field|add_class:"form-control" }}
+                        {% if field.errors %}
+                            <div class="text-danger small">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            <h6 class="fw-bold mt-3 text-secondary">Parent Information</h6><hr>
+            {% for field in form.visible_fields %}
+                {% if field.name in "mother_name father_name parents_contact"%}
+                    <div class="mb-3">
+                        {{ field.label_tag }}
+                        {{ field|add_class:"form-control" }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            <h6 class="fw-bold mt-3 text-secondary">Next of Kin Information</h6><hr>
+            {% for field in form.visible_fields %}
+                {% if field.name in "nok_name nok_relationship nok_contact nok_address nok_date_of_birth"%}
+                    <div class="mb-3">
+                        {{ field.label_tag }}
+                        {{ field|add_class:"form-control" }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            <button class="btn btn-success w-100 mt-4">Submit KYC</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

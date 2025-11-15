@@ -1,0 +1,132 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+body {
+  background-color: #f9fafb;
+  color: #111827;
+}
+
+.dashboard {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  background: #fff;
+  padding: 20px;
+  border-right: 1px solid #e5e7eb;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.menu {
+  list-style: none;
+}
+
+.menu li {
+  padding: 10px 0;
+  color: #374151;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.menu li:hover {
+  color: #2563eb;
+}
+
+/* Main */
+.main {
+  padding: 20px 30px;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.search {
+  width: 250px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+}
+
+.star {
+  background: #f3f4f6;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Card */
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.sales h3 {
+  font-size: 2rem;
+  color: #111827;
+}
+
+.growth {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.chart-placeholder {
+  background: #e0f2fe;
+  height: 180px;
+  margin-top: 15px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Table */
+.transactions table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.transactions th {
+  text-align: left;
+  color: #6b7280;
+  font-size: 0.9rem;
+  padding-bottom: 10px;
+}
+
+.transactions td {
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.transactions td:last-child {
+  text-align: right;
+  font-weight: 600;
+}

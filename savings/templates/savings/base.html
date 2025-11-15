@@ -1,0 +1,129 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %}</title>
+
+    
+    <link href="{% static 'assets/css/bootstrap.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/bootstrap.css">
+    <link href="{% static 'assets/vendors/perfect-scrollbar/perfect-scrollbar.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendors/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/css/app.css' %}" rel="stylesheet">
+</head>
+
+<body>
+<div id="app">
+    <!-- ✅ SIDEBAR START -->
+     <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{% url 'dashboard' %}"><img src="assets/images/logo/logo.png" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item active ">
+                            <a href="{%url 'savings:account_overview' %}" class='sidebar-link'>
+                                <i class="bi bi-grid-fill"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                         <li class="sidebar-title">Savings</li>
+    <li class="sidebar-item">
+        <a href="{% url 'savings:account' %}" class='sidebar-link'>
+            <i class="bi bi-piggy-bank-fill"></i><span>My Savings Account</span>
+        </a>
+    </li>
+    <li class="sidebar-item">
+        <a href="" class='sidebar-link'>
+            <i class="bi bi-cash-stack"></i><span>Make Deposit</span>
+        </a>
+    </li>
+    <li class="sidebar-item">
+        <a href="" class='sidebar-link'>
+            <i class="bi bi-list-check"></i><span>Deposit History</span>
+        </a>
+    </li>
+
+    <li class="sidebar-title">Loans</li>
+    <li class="sidebar-item">
+        <a href="" class='sidebar-link'>
+            <i class="bi bi-cash-coin"></i><span>Apply for Loan</span>
+        </a>
+    </li>
+    <li class="sidebar-item">
+        <a href="" class='sidebar-link'>
+            <i class="bi bi-receipt"></i><span>My Loans</span>
+        </a>
+    </li>
+
+    <li class="sidebar-title">Transactions</li>
+    <li class="sidebar-item">
+        <a href="" class='sidebar-link'>
+            <i class="bi bi-clock-history"></i><span>Transaction History</span>
+        </a>
+    </li>
+
+    <li class="sidebar-title">Account</li>
+    <li class="sidebar-item">
+        <a href="" class='sidebar-link'>
+            <i class="bi bi-person-fill"></i><span>My Profile</span>
+        </a>
+    </li>
+    <li class="sidebar-item">
+        <a href="{% url 'logout' %}" class='sidebar-link text-danger'>
+            <i class="bi bi-box-arrow-left"></i><span>Logout</span>
+        </a>
+    </li>
+
+
+                      
+                        
+
+                        
+            </div>
+        </div>
+    <!-- ✅ SIDEBAR END -->
+
+
+    <!-- MAIN CONTENT AREA -->
+    <div id="main">
+        <header class="mb-3">
+            <a href="#" class="burger-btn d-block d-xl-none">
+                <i class="bi bi-justify fs-3"></i>
+            </a>
+        </header>
+
+        <!-- Main Content for each page -->
+        <div class="page-content">
+            {% block content %}
+            {% endblock %}
+        </div>
+
+        <footer>
+            <div class="footer clearfix mb-0 text-muted">
+                <div class="float-start">
+                    <p>2025 &copy; Kinna Sacco</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<script src="{% static 'assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js' %}"></script>
+<script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/js/main.js' %}"></script>
+</body>
+</html>

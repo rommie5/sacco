@@ -1,0 +1,17 @@
+{% extends "users/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    {% if profile.is_approved %}
+        <h3 class="text-success">✅ Profile Approved!</h3>
+        <p class="fs-5">Your account has been approved. You can now access all SACCO features.</p>
+        <a href="{% url 'dashboard' %}" class="btn btn-primary mt-3">Go to Dashboard</a>
+    {% else %}
+        <h3 class="text-warning">✅ Profile Submitted!</h3>
+        <p class="fs-5">Your account is pending approval by the SACCO administration.</p>
+        <p class="text-muted fw-bold">You will be notified when approved.</p>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">Go to Dashboard</a>
+    {% endif %}
+</div>
+{% endblock %}

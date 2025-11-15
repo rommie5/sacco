@@ -1,0 +1,32 @@
+{% extends 'users/base.html' %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<h3 class="text-primary fw-bold">My Profile</h3>
+<hr>
+
+<div class="row">
+    <div class="col-md-4">
+        {% if user.profile.passport_photo %}
+        <img src="{{ user.profile.passport_photo.url }}" class="img-fluid rounded shadow">
+        {% else %}
+        <img src="https://via.placeholder.com/200" class="img-fluid rounded shadow">
+        {% endif %}
+    </div>
+
+    <div class="col-md-8">
+        <h5 class="fw-bold">{{ user.profile.full_name }}</h5>
+        <p><strong>Phone:</strong> {{ user.profile.phone_number }}</p>
+        <p><strong>Area:</strong> {{ user.profile.area_of_residence }}</p>
+        <p><strong>KYC Status:</strong> 
+            {% if user.profile.is_approved %}
+            ✅ Approved Member
+            {% elif user.profile.is_completed %}
+            ⏳ Awaiting Approval
+            {% else %}
+            ❌ Incomplete — <a href="{% url 'complete_profile' %}">Finish Now</a>
+            {% endif %}
+        </p>
+    </div>
+</div>
+{% endblock %}

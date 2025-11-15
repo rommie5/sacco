@@ -1,0 +1,36 @@
+{% extends 'users/bases.html' %}
+{% load static %}
+
+{% block content %}
+
+<h3>Deposit to Savings</h3>
+
+<input id="amount" class="form-control w-50" placeholder="Enter amount">
+
+<button id="payBtn" class="btn btn-primary mt-3">Pay with Stripe</button>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    const stripe = Stripe("{{ STRIPE_PUBLIC_KEY }}");
+
+    document.getElementById("payBtn").onclick = async () => {
+        const amount = document.getElementById("amount").value;
+
+        const res = await fetch(`/savings/deposit/create-intent/?amount=${amount}`);
+        const data = await res.json();
+
+        const result = await stripe.confirmCardPayment(data.clientSecret, {
+            payment_method: {
+                card: {
+                    // We'll add Stripe Elements later
+                }
+            }
+        });
+
+        if (result.paymentIntent && result.paymentIntent.status === "succeeded") {
+            window.location.href = "/savings/success/";
+        }
+    }
+</script>
+
+{% endblock %}
