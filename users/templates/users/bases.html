@@ -47,7 +47,7 @@
         </a>
     </li>
     <li class="sidebar-item">
-        <a href="" class='sidebar-link'>
+        <a href="{% url 'savings:deposit' %}" class='sidebar-link'>
             <i class="bi bi-cash-stack"></i><span>Make Deposit</span>
         </a>
     </li>
@@ -59,22 +59,28 @@
 
     <li class="sidebar-title">Loans</li>
     <li class="sidebar-item">
-        <a href="" class='sidebar-link'>
+        <a href="{% url 'loans:apply' %}" class='sidebar-link'>
             <i class="bi bi-cash-coin"></i><span>Apply for Loan</span>
         </a>
     </li>
     <li class="sidebar-item">
-        <a href="" class='sidebar-link'>
+        <a href="{% url 'loans:dashboard' %}" class='sidebar-link'>
             <i class="bi bi-receipt"></i><span>My Loans</span>
         </a>
     </li>
 
-    <li class="sidebar-title">Transactions</li>
     <li class="sidebar-item">
-        <a href="" class='sidebar-link'>
-            <i class="bi bi-clock-history"></i><span>Transaction History</span>
-        </a>
-    </li>
+    <a href="{% url 'loans:repay_loan' loan.id %}" class='sidebar-link'>
+        <i class="bi bi-receipt"></i><span>Repay Loan</span>
+    </a>
+</li>
+
+   <li class="sidebar-item">
+    <a href="{% url 'savings:transaction_history' %}" class='sidebar-link'>
+        <i class="bi bi-clock-history"></i><span>Transaction History</span>
+    </a>
+   </li>
+
 
     <li class="sidebar-title">Account</li>
     <li class="sidebar-item">

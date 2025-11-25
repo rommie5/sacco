@@ -1,0 +1,9 @@
+{% extends 'users/bases.html' %}
+{% block content %}
+<div class="card shadow-sm mt-4 p-4 text-center">
+    <h3 class="text-success">Deposit Successful!</h3>
+    <p>You deposited ${{ amount }} to your account {{ account.account_number }}.</p>
+    <p>New Balance: ${{ account.balance }}</p>
+    <a href="{% url 'savings:account' %}" class="btn btn-primary">Back to Account</a>
+</div>
+{% endblock %}

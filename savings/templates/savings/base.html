@@ -42,15 +42,16 @@
 
                          <li class="sidebar-title">Savings</li>
     <li class="sidebar-item">
-        <a href="{% url 'savings:account' %}" class='sidebar-link'>
+        <a href="{% url 'savings:account_overview' %}" class='sidebar-link'>
             <i class="bi bi-piggy-bank-fill"></i><span>My Savings Account</span>
         </a>
     </li>
     <li class="sidebar-item">
-        <a href="" class='sidebar-link'>
-            <i class="bi bi-cash-stack"></i><span>Make Deposit</span>
-        </a>
-    </li>
+    <a href="{% url 'savings:deposit_view' account.id %}" class='sidebar-link'>
+        <i class="bi bi-cash-stack"></i><span>Make Deposit</span>
+    </a>
+</li>
+
     <li class="sidebar-item">
         <a href="" class='sidebar-link'>
             <i class="bi bi-list-check"></i><span>Deposit History</span>

@@ -9,8 +9,8 @@ urlpatterns=[
     path('dashboard/',views.dashboard_view,name='dashboard'),
     path('completeprofile/', views.completeprofile, name='completeprofile'),
     path('pending-approval/', views.pending_approval, name='pending_approval'),
-
-
+    path('transactions/', views.transaction_history_view, name='transaction_history'),
+    
     
 
 ]

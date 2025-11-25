@@ -11,8 +11,8 @@ def get_access_token():
     resp = requests.post(
         f"{PESAPAL_BASE_URL}/Auth/RequestToken",
         json={
-            "consumer_key": "8sdX0mBowUeoJZGvX+HX1BcAP3HnwbXA",
-            "consumer_secret": "5QcPzMsvQ8suffgtyNg9px/ovw4=",
+            "consumer_key": "+",
+            "consumer_secret": "",
         }
     )
     resp.raise_for_status()

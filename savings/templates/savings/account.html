@@ -1,0 +1,61 @@
+{% extends 'users/bases.html' %}
+{% load static %}
+
+{% block title %}My Account{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+    <h3 class="text-primary">My Account</h3>
+    <p class="text-muted">Overview of your SACCO account</p>
+</div>
+
+{% if savings_account %}
+<section class="row">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Account Number</h6>
+                <h4 class="fw-bold">{{ savings_account.account_number }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Total Balance</h6>
+                <h3 class="text-success fw-bold">UGX {{ savings_account.balance|floatformat:2 }}</h3>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="card-title">Recent Contributions</h5>
+            </div>
+            <div class="card-body">
+                {% if contributions %}
+                    <ul class="list-group">
+                        {% for contribution in contributions %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                UGX {{ contribution.amount|floatformat:2 }}
+                                <span class="badge bg-{{ contribution.status|lower }}">{{ contribution.status }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">No contributions recorded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% else %}
+<div class="alert alert-warning">
+    <strong>Notice:</strong> You do not have a savings account yet.
+</div>
+{% endif %}
+{% endblock %}

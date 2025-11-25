@@ -1,0 +1,43 @@
+{% extends 'users/bases.html' %}
+
+{% block title %}Loans Dashboard{% endblock %}
+
+{% block content %}
+<h3>My Loans</h3>
+<p>Total Loan Obligations: UGX {{ total_loans|floatformat:2 }}</p>
+
+<a href="{% url 'loans:apply' %}" class="btn btn-primary mb-3">Apply for Loan</a>
+
+{% if loans %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Total Payable</th>
+            <th>Applied At</th>
+            <th>Approved/Declined At</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for loan in loans %}
+        <tr>
+            <td>UGX {{ loan.amount|floatformat:2 }}</td>
+            <td>{{ loan.status }}</td>
+            <td>UGX {{ loan.total_payable|floatformat:2 }}</td>
+            <td>{{ loan.applied_at|date:"d M Y" }}</td>
+            <td>
+                {% if loan.status == "Approved" %}
+                    {{ loan.approved_at|date:"d M Y" }}
+                {% elif loan.status == "Rejected" %}
+                    {{ loan.declined_at|date:"d M Y" }}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No loans applied yet.</p>
+{% endif %}
+{% endblock %}

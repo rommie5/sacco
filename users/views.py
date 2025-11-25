@@ -1,83 +1,116 @@
-from django.shortcuts import render,redirect
-from django.contrib.auth import login,authenticate,logout
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
-from .forms import UserRegistrationForm, UserLoginForm,CompleteProfileForm
-from .models import MemberProfile
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Count
+from .forms import UserRegistrationForm, UserLoginForm, CompleteProfileForm
+from .models import MemberProfile
 from savings.models import SavingsAccount
 import uuid
-from . import signals
-# Create your views here.
+from savings.models import SavingsAccount, Contribution
+from users.models import MemberProfile
+from django.db.models import Sum
+from django.db import models
+from loans.models import Loan, LoanRepayment
+from decimal import Decimal
+from transactions.models import Transaction
 
+
+# -----------------------
+# Registration
+# -----------------------
+from django.db import transaction
+
+def generate_account_number():
+    """Generates a unique 12-digit SACCO account number."""
+    while True:
+        account_number = str(uuid.uuid4().int)[:12]
+        if not SavingsAccount.objects.filter(account_number=account_number).exists():
+            return account_number
 def register_view(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            #Default role for public registration
-            user.is_member = True
-            user.is_admin = False
-            user.is_auditor = False
-            user.save()
+            with transaction.atomic():
+                # Save user
+                user = form.save(commit=False)
+                user.is_member = True
+                user.is_admin = False
+                user.is_auditor = False
+                user.save()
+
+                # Create MemberProfile and SavingsAccount safely
+                profile, _ = MemberProfile.objects.get_or_create(user=user)
+                SavingsAccount.objects.get_or_create(
+                    member=profile,
+                    defaults={'account_number': generate_account_number()}
+                )
+
             messages.success(request, "Registration successful. You can now log in.")
             return redirect('login')
         else:
             messages.error(request, "Please correct the errors below.")
     else:
         form = UserRegistrationForm()
-    return render(request, 'users/register.html', {
-        'form': form,
-    })
-#Login View with profile checks
-@login_required
+    
+    return render(request, 'users/register.html', {'form': form})
+# -----------------------
+# Login with profile checks
+# -----------------------
+
+
 def login_view(request):
     form = UserLoginForm(request, data=request.POST or None)
 
-    if request.method == 'POST':
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
+    if request.method == 'POST' and form.is_valid():
+        user = form.get_user()
+        login(request, user)
 
-            # ✅ Ensure profile exists
-            member_profile = getattr(user, 'memberprofile', None)
+        # Ensure member profile exists
+        profile, created = MemberProfile.objects.get_or_create(user=user)
 
-            # ✅ Member but no profile yet → create one
-            if user.is_member and member_profile is None:
-                from .models import MemberProfile
-                MemberProfile.objects.create(user=user)
-                return redirect('completeprofile')
+        # Ensure linked savings account exists
+        if created or not hasattr(profile, 'savings_account'):
+            from savings.models import SavingsAccount
+            from users.views import generate_account_number
+            SavingsAccount.objects.create(
+                member=profile,
+                account_number=generate_account_number()
+            )
 
-            # ✅ Member with incomplete profile
-            if user.is_member and not member_profile.is_completed:
-                return redirect('completeprofile')
+        # Incomplete profile → redirect to complete profile
+        if not profile.is_completed:
+            messages.warning(request, "Please complete your profile to access the SACCO dashboard.")
+            return redirect('completeprofile')
 
-            # ✅ Completed but waiting admin approval
-            if user.is_member and not member_profile.is_approved:
-                return redirect('pending_approval')
+        # Waiting admin approval
+        if not profile.is_approved:
+            return redirect('pending_approval')
 
-            # ✅ Approved users go to dashboard
-            return redirect('dashboard')
-
-        messages.error(request, "Invalid username or password")
+        # Approved → dashboard
+        return redirect('dashboard')
 
     return render(request, 'registration/login.html', {'form': form})
-    
 
 
-#Pending approval view
+# -----------------------
+# Pending approval view
+# -----------------------
 @login_required
 def pending_approval(request):
-    # Refresh the user profile 
-    profile = MemberProfile.objects.get(user=request.user)
+    profile = request.user.memberprofile
 
+    # If already approved, redirect to dashboard
     if profile.is_approved:
         return redirect('dashboard')
-    
-    # Still pending
+
     return render(request, 'users/pending.html', {'profile': profile})
 
 
+# -----------------------
+# Admin dashboard
+# -----------------------
+@login_required
 def admin_dashboard(request):
     context = {
         "pending_approvals": MemberProfile.objects.filter(is_approved=False).count(),
@@ -86,57 +119,102 @@ def admin_dashboard(request):
     return render(request, "users/admin.html", context)
 
 
+# -----------------------
+# User dashboard
+# -----------------------
+@login_required
 def dashboard_view(request):
-   
-   
-    # Get the user's savings account if it exists
+    profile = request.user.memberprofile
+
     try:
-        account = request.user.savings_account  # OneToOneField related_name
+        savings_account = profile.savings_account
+        total_balance = savings_account.balance
+
+        contributions = Contribution.objects.filter(account__member=profile)
+        total_contributions = contributions.aggregate(total=models.Sum('amount'))['total'] or Decimal('0.00')
+
+        # Calculate total outstanding loan balance
+        loans = Loan.objects.filter(member=profile, status='Approved')
+        total_loans = sum([loan.total_payable() for loan in loans], Decimal('0.00'))
+
+        # Calculate total repayments
+        repayments = LoanRepayment.objects.filter(loan__member=profile)
+        total_repaid = sum([r.amount for r in repayments], Decimal('0.00'))
+
+        outstanding_loan_balance = total_loans - total_repaid
+
     except SavingsAccount.DoesNotExist:
-        account = None
+        savings_account = None
+        total_balance = Decimal('0.00')
+        contributions = []
+        total_contributions = Decimal('0.00')
+        outstanding_loan_balance = Decimal('0.00')
 
     context = {
-        "account": account,
+        'profile': profile,
+        'savings_account': savings_account,
+        'total_balance': total_balance,
+        'total_contributions': total_contributions,
+        'contributions': contributions.order_by('-created_at')[:5],  # last 5 contributions
+        'outstanding_loan_balance': outstanding_loan_balance,
     }
+
     return render(request, 'users/dashboard.html', context)
 
+# -----------------------
+# Complete member profile
+# -----------------------
 @login_required
 def completeprofile(request):
-    try:
-        profile = request.user.memberprofile  # assuming OneToOne relation
-    except MemberProfile.DoesNotExist:
-        profile = MemberProfile(user=request.user)  # create if missing
+    profile, created = MemberProfile.objects.get_or_create(user=request.user)
 
     if request.method == 'POST':
         form = CompleteProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             profile = form.save(commit=False)
-            profile.user = request.user
             profile.is_completed = True
-            profile.is_approved = False # ✅ must wait for admin approval
+            profile.is_approved = False  # Must wait for admin approval
             profile.save()
-            messages.success(request, "Profile submitted! Waiting approval.")
+            messages.success(request, "Profile submitted! Waiting for approval.")
             return redirect('pending_approval')
     else:
         form = CompleteProfileForm(instance=profile)
 
     return render(request, 'users/completeprofile.html', {'form': form})
 
+
+# -----------------------
+# Logout
+# -----------------------
+@login_required
 def logout_view(request):
     logout(request)
     return redirect('login')
 
-def profile_view(request):
-    try:
-        profile = MemberProfile.objects.get(user=request.user)
-    except MemberProfile.DoesNotExist:
-        #Create a profile if missing
-        profile = MemberProfile.objects.create(
-            user=request.user,
-            national_id="N/A",
-            phone_number="N/A",
-            address="",
-            membership_status="Pending"
-        )
 
+# -----------------------
+# Profile view
+# -----------------------
+@login_required
+def profile_view(request):
+    profile, created = MemberProfile.objects.get_or_create(
+        user=request.user,
+        defaults={
+            "national_id": "N/A",
+            "phone_number": "N/A",
+            "address": "",
+            "membership_status": "Pending"
+        }
+    )
     return render(request, 'users/profile.html', {'profile': profile})
+
+
+@login_required
+def transaction_history_view(request):
+    profile = request.user.memberprofile
+    transactions = Transaction.objects.filter(member=profile).order_by('-created_at')
+
+    context = {
+        'transactions': transactions,
+    }
+    return render(request, 'users/transaction_history.html', context)

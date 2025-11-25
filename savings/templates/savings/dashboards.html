@@ -1,0 +1,96 @@
+{% extends 'users/bases.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="page-heading">
+    <h3 class="text-primary">Welcome back, {{ request.user.memberprofile.full_name }} 👋</h3>
+    <p class="text-muted">Here is your SACCO account overview</p>
+</div>
+
+<!-- Alerts Based on Profile Status -->
+{% if not request.user.memberprofile.is_completed %}
+<div class="alert alert-warning">
+    <strong>Action Required!</strong> Please complete your profile to unlock full access.
+    <a href="{% url 'completeprofile' %}" class="btn btn-sm btn-dark float-end">Complete KYC</a>
+</div>
+{% elif not request.user.memberprofile.is_approved %}
+<div class="alert alert-info">
+    <strong>Pending Approval</strong> Your membership is under review by the SACCO admin.
+</div>
+{% endif %}
+
+<section class="row">
+
+    <!-- Savings Card -->
+    <div class="col-12 col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Total Savings</h6>
+                <h3 class="text-success fw-bold">UGX {{ total_balance|floatformat:2 }}</h3>
+                <small>Total contributions: UGX {{ total_contributions|floatformat:2 }}</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shares Card -->
+    <div class="col-12 col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Shares Value</h6>
+                <h3 class="text-primary fw-bold">UGX 0.00</h3>
+                <small>Updated today</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loan Card -->
+    <div class="col-12 col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Loan Balance</h6>
+                <h3 class="text-danger fw-bold">UGX 0.00</h3>
+                <small>Updated today</small>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Contributions -->
+<section class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="card-title">Recent Contributions</h5>
+            </div>
+            <div class="card-body">
+                {% if contributions %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount (UGX)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for contribution in contributions %}
+                            <tr>
+                                <td>{{ contribution.created_at|date:"d M Y" }}</td>
+                                <td>{{ contribution.amount|floatformat:2 }}</td>
+                                <td>{{ contribution.status }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-muted">No financial transactions recorded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'users/bases.html' %}
+
+{% block title %}Apply for Loan{% endblock %}
+
+{% block content %}
+<h3>Loan Application</h3>
+<p>Your current savings: UGX {{ request.user.memberprofile.savings_account.balance|floatformat:2 }}</p>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Submit Loan Application</button>
+</form>
+{% endblock %}

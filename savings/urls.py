@@ -1,14 +1,13 @@
 from django.urls import path
-from . import views
+from .views import deposit_view, stripe_webhook,account_view,deposit_success,transaction_history_view
 
-app_name = 'savings' 
+app_name = 'savings'
 
 urlpatterns = [
-   # path('', views.dashboard, name='dashboard'),
-    path('deposit/', views.deposit, name='deposit'),
-   # path('deposit/create-intent/', views.create_stripe_intent, name='create_intent'),
-    #path('success/', views.success, name='success'),
-    path('', views.dashboard, name='savings_dashboard'),
-    path('deposit/', views.deposit, name='savings_deposit'),
-  
+    path('deposit/', deposit_view, name='deposit'),
+    path('deposit/webhook/', stripe_webhook, name='stripe-webhook'),
+    path("deposit/success/", deposit_success, name="deposit_success"),
+    path('account/', account_view, name='account'),
+    path('transactions/', transaction_history_view, name='transaction_history'),
+
 ]

@@ -1,50 +1,44 @@
 from django.db import models
-from django.conf import settings
 from django.utils import timezone
+from users.models import MemberProfile
+from transactions.models import Transaction
+import uuid
+
+def generate_account_number():
+    return str(uuid.uuid4())[:50]  # 50 chars max
 
 class SavingsAccount(models.Model):
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
+    member = models.OneToOneField(
+        MemberProfile,
         on_delete=models.CASCADE,
         related_name='savings_account'
     )
-    balance = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
-    account_type = models.CharField(max_length=50, default="savings")
+    account_number = models.CharField(max_length=50, unique=True)
+    balance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"{self.user.username}'s Savings"
-
-class Deposit(models.Model):
-    account = models.ForeignKey(
-        SavingsAccount,
-        on_delete=models.CASCADE,
-        related_name='deposits'
+        return f"{self.member.user.username} - {self.account_number}"
+    
+    
+class Contribution(models.Model):
+    STATUS_CHOICES = (
+        ('Pending', 'Pending'),
+        ('Confirmed', 'Confirmed'),
+        ('Failed', 'Failed'),
     )
+
+    account = models.ForeignKey(SavingsAccount, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
-    stripe_charge_id = models.CharField(max_length=100, blank=True, null=True)
+    payment_method = models.CharField(max_length=50, default="Stripe")
+    transaction = models.OneToOneField(
+        Transaction,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"Deposit of {self.amount} to {self.account.user.username}"
-
-class Transaction(models.Model):
-    TRANSACTION_TYPES = (
-        ('deposit', 'Deposit'),
-        ('withdrawal', 'Withdrawal'),
-    )
-
-    account = models.ForeignKey(
-        SavingsAccount,
-        on_delete=models.CASCADE,
-        related_name='transactions'
-    )
-    transaction_type = models.CharField(max_length=20, choices=TRANSACTION_TYPES)
-    amount = models.DecimalField(max_digits=12, decimal_places=2)
-    balance_after = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    stripe_charge_id = models.CharField(max_length=100, blank=True, null=True)
-    created_at = models.DateTimeField(default=timezone.now)
-    description = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.transaction_type.title()} of {self.amount} for {self.account.user.username}"
+        return f"{self.account.account_number} - {self.amount} ({self.status})"
