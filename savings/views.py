@@ -13,12 +13,6 @@ import stripe
 from django.conf import settings
 stripe.api_key = settings.STRIPE_SECRET_KEY
 gateway = StripeGateway()
-
-# savings/views.py
-import stripe
-from django.conf import settings
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from .models import SavingsAccount, Contribution
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -78,7 +72,21 @@ def deposit_view(request):
 
     return render(request, "savings/deposit.html", {"account": account, "stripe_key": settings.STRIPE_PUBLIC_KEY})
 
+@login_required
+def deposit_history_view(request):
+    profile = request.user.memberprofile
+    try:
+        account = profile.savings_account
+    except SavingsAccount.DoesNotExist:
+        messages.error(request, "No savings account found. Contact admin.")
+        return redirect('dashboard')
 
+    contributions = Contribution.objects.filter(account=account).order_by('-created_at')
+
+    context = {
+        'contributions': contributions,
+    }
+    return render(request, 'savings/deposit_history.html', context)
 # Succes View for Deposit
 from decimal import Decimal
 

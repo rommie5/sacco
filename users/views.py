@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render,get_object_or_404, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -133,14 +133,13 @@ def dashboard_view(request):
         contributions = Contribution.objects.filter(account__member=profile)
         total_contributions = contributions.aggregate(total=models.Sum('amount'))['total'] or Decimal('0.00')
 
-        # Calculate total outstanding loan balance
+        # Outstanding loan
         loans = Loan.objects.filter(member=profile, status='Approved')
-        total_loans = sum([loan.total_payable() for loan in loans], Decimal('0.00'))
+        active_loan = loans.first()
 
-        # Calculate total repayments
+        total_loans = sum([loan.total_payable() for loan in loans], Decimal('0.00'))
         repayments = LoanRepayment.objects.filter(loan__member=profile)
         total_repaid = sum([r.amount for r in repayments], Decimal('0.00'))
-
         outstanding_loan_balance = total_loans - total_repaid
 
     except SavingsAccount.DoesNotExist:
@@ -149,18 +148,35 @@ def dashboard_view(request):
         contributions = []
         total_contributions = Decimal('0.00')
         outstanding_loan_balance = Decimal('0.00')
+        active_loan = None
 
     context = {
         'profile': profile,
         'savings_account': savings_account,
         'total_balance': total_balance,
         'total_contributions': total_contributions,
-        'contributions': contributions.order_by('-created_at')[:5],  # last 5 contributions
+        'contributions': contributions.order_by('-created_at')[:5],
         'outstanding_loan_balance': outstanding_loan_balance,
+        'active_loan': active_loan,
     }
 
     return render(request, 'users/dashboard.html', context)
 
+#repay loan 
+@login_required
+def repay_loan(request, loan_id):
+    loan = get_object_or_404(Loan, id=loan_id, member=request.user.memberprofile)
+
+    if request.method == "POST":
+        amount = Decimal(request.POST.get("amount"))
+        LoanRepayment.objects.create(loan=loan, amount=amount)
+
+        return redirect("dashboard")
+
+    context = {
+        "loan": loan
+    }
+    return render(request, "loans/repay_loan.html", context)
 # -----------------------
 # Complete member profile
 # -----------------------

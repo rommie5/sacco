@@ -1,0 +1,55 @@
+{% extends 'users/bases.html' %}
+{% load static %}
+
+{% block title %}Deposit History{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Deposit History</h2>
+
+    {% if message %}
+        <div class="alert alert-warning">
+            {{ message }}
+        </div>
+        <a href="{% url 'savings:deposit' %}" class="btn btn-primary mt-2">Make Your First Deposit</a>
+    {% else %}
+        {% if deposits %}
+            <div class="table-responsive mt-3">
+                <table class="table table-striped table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for deposit in deposits %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>KES {{ deposit.amount }}</td>
+                            <td>{{ deposit.date|date:"M d, Y H:i" }}</td>
+                            <td>
+                                {% if deposit.status == "Confirmed" %}
+                                    <span class="badge bg-success">{{ deposit.status }}</span>
+                                {% elif deposit.status == "Pending" %}
+                                    <span class="badge bg-warning text-dark">{{ deposit.status }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ deposit.status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info mt-3">
+                You have no deposits yet.
+            </div>
+            <a href="{% url 'savings:deposit' %}" class="btn btn-primary mt-2">Make a Deposit</a>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

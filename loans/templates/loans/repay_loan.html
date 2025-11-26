@@ -1,19 +1,76 @@
-{% extends 'users/bases.html' %}
-
-{% block title %}Repay Loan{% endblock %}
+{% extends "users/bases.html" %}
+{% load static %}
 
 {% block content %}
-<div class="card shadow-sm mt-4 p-4">
-    <h3>Repay Loan</h3>
-    <p>Loan Amount: UGX {{ loan.amount|floatformat:2 }}</p>
-    <p>Outstanding Balance: UGX {{ outstanding|floatformat:2 }}</p>
-    <form method="POST">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="amount">Repayment Amount (UGX)</label>
-            <input type="number" step="0.01" name="amount" class="form-control" max="{{ outstanding }}" required>
+<div class="container mt-4">
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-body">
+
+                    <h4 class="fw-bold text-primary mb-3">
+                        Repay Loan
+                    </h4>
+
+                    <p class="mb-1">
+                        <strong>Loan Amount:</strong> UGX {{ loan.amount }}
+                    </p>
+
+                    <p class="mb-1">
+                        <strong>Total Payable (with interest):</strong>
+                        UGX {{ loan.total_payable }}
+                    </p>
+
+                    <p class="mb-1">
+                        <strong>Outstanding Balance:</strong>
+                        <span class="text-danger fw-bold">UGX {{ outstanding }}</span>
+                    </p>
+
+                    <p class="mb-3">
+                        <strong>Your Savings Balance:</strong>
+                        UGX {{ loan.savings_account.balance }}
+                    </p>
+
+                    <hr>
+
+                    {% if outstanding <= 0 %}
+                        <div class="alert alert-success">
+                            This loan is already fully paid.
+                        </div>
+                    {% else %}
+
+                        <form method="POST">
+                            {% csrf_token %}
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Enter Repayment Amount (UGX)</label>
+                                <input type="number"
+                                       name="amount"
+                                       class="form-control"
+                                       placeholder="e.g. 50000"
+                                       min="1"
+                                       required>
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-primary w-100 py-2 fw-bold">
+                                Repay Now
+                            </button>
+                        </form>
+
+                    {% endif %}
+
+                    <a href="{% url 'dashboard' %}" class="btn btn-link mt-3 w-100">
+                        ← Back to Dashboard
+                    </a>
+
+                </div>
+            </div>
+
         </div>
-        <button type="submit" class="btn btn-success">Repay Loan</button>
-    </form>
+    </div>
+
 </div>
 {% endblock %}
